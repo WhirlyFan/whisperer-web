@@ -16,16 +16,27 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+env.read_env(os.path.join(BASE_DIR, '.env'))
+
+# Put an ENV_FILE_EXISTS variable in the .env file to enable error handling
+if not env.bool('ENV_FILE_EXISTS', default=False):
+    import warnings
+    # Enables warning for missing .env file.
+    warnings.warn("The .env file is missing. Please ensure it exists.", RuntimeWarning)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
+# For every variable retrieved from the .env file, use corresponding data type methods
+# from django-environ documentation and provide a default value.
+# Or else KeyError will be raised without a .env file and needs to be handled everytime a env variable is retrieved.
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = env('SECRET_KEY', default='your_default_secret_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', default=True)
 
 ALLOWED_HOSTS = []
 
